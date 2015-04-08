@@ -15,7 +15,7 @@ module MessageFormat
     end
 
     def format ( args=nil )
-      return @format.call(args)
+      @format.call(args)
     end
 
   end
@@ -23,7 +23,15 @@ module MessageFormat
   class << self
 
     def new ( pattern, locale=nil )
-      return MessageFormat.new(pattern, locale)
+      MessageFormat.new(pattern, locale)
+    end
+
+    def format_message ( pattern, args=nil, locale=nil )
+      locale ||= TwitterCldr.locale
+      Interpreter.interpret(
+        Parser.parse(pattern),
+        { :locale => locale.to_sym }
+      ).call(args)
     end
 
   end

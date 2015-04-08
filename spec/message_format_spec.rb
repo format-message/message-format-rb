@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe MessageFormat do
-  describe '#new' do
+  describe '.new' do
     it 'throws an error on bad syntax' do
       expect { MessageFormat.new({}) }.to raise_error
       expect { MessageFormat.new('no finish arg {') }.to raise_error
@@ -106,6 +106,29 @@ describe MessageFormat do
 
     it 'should throw an error when args are expected and not passed' do
       expect { MessageFormat.new('{a}').format() }.to raise_error
+    end
+  end
+
+  describe '.formatMessage' do
+    it 'formats messages' do
+      pattern =
+        'On {takenDate, date, short} {name} {numPeople, plural, offset:1
+            =0 {didn\'t carpool.}
+            =1 {drove himself.}
+         other {drove # people.}}'
+      message = MessageFormat.format_message(pattern,
+        :takenDate => DateTime.now,
+        :name => 'Bob',
+        :numPeople => 5
+      )
+      expect(message).to match(/^On \d\d?\/\d\d?\/\d{2,4} Bob drove 4 people.$/)
+
+      message = MessageFormat::format_message(pattern,
+        :takenDate => DateTime.now,
+        :name => 'Bill',
+        :numPeople => 6
+      )
+      expect(message).to match(/^On \d\d?\/\d\d?\/\d{2,4} Bill drove 5 people.$/)
     end
   end
 

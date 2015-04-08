@@ -32,36 +32,32 @@ module MessageFormat
       @pattern = pattern
       @length = pattern.length
       @index = 0
-      return parse_message("message")
+      parse_message("message")
     end
 
     def is_digit ( char )
-      return (
-        char == '0' or
-        char == '1' or
-        char == '2' or
-        char == '3' or
-        char == '4' or
-        char == '5' or
-        char == '6' or
-        char == '7' or
-        char == '8' or
-        char == '9'
-      )
+      char == '0' or
+      char == '1' or
+      char == '2' or
+      char == '3' or
+      char == '4' or
+      char == '5' or
+      char == '6' or
+      char == '7' or
+      char == '8' or
+      char == '9'
     end
 
     def is_whitespace ( char )
-      return (
-        char == "\s" or
-        char == "\t" or
-        char == "\n" or
-        char == "\r" or
-        char == "\f" or
-        char == "\v" or
-        char == "\u00A0" or
-        char == "\u2028" or
-        char == "\u2029"
-      )
+      char == "\s" or
+      char == "\t" or
+      char == "\n" or
+      char == "\r" or
+      char == "\f" or
+      char == "\v" or
+      char == "\u00A0" or
+      char == "\u2028" or
+      char == "\u2029"
     end
 
     def skip_whitespace ()
@@ -120,7 +116,7 @@ module MessageFormat
         end
       end
 
-      return text
+      text
     end
 
     def parse_argument ()
@@ -175,7 +171,7 @@ module MessageFormat
       end
       @index += 1 # move passed
 
-      return (type == 'plural' or type == 'selectordinal') ?
+      (type == 'plural' or type == 'selectordinal') ?
         [ id, type, offset, format ] :
         [ id, type, format ]
     end
@@ -198,7 +194,7 @@ module MessageFormat
         raise_expected('argument id')
       end
       skip_whitespace()
-      return id
+      id
     end
 
     def parse_arg_type ()
@@ -218,7 +214,7 @@ module MessageFormat
         raise_expected(types.join(', '))
       end
       skip_whitespace()
-      return arg_type
+      arg_type
     end
 
     def parse_simple_format ()
@@ -228,7 +224,7 @@ module MessageFormat
         raise_expected('argument style name')
       end
       skip_whitespace()
-      return style
+      style
     end
 
     def parse_plural_offset ()
@@ -250,7 +246,7 @@ module MessageFormat
         offset = @pattern[start..@index].to_i
         skip_whitespace()
       end
-      return offset
+      offset
     end
 
     def parse_sub_messages ( parent_type )
@@ -273,7 +269,7 @@ module MessageFormat
       if !options.has_key?('other') # does not have an other selector
         raise_expected(nil, nil, '"other" option must be specified in ' + parent_type)
       end
-      return options
+      options
     end
 
     def parse_selector ()
@@ -293,7 +289,7 @@ module MessageFormat
         raise_expected('selector')
       end
       skip_whitespace()
-      return selector
+      selector
     end
 
     def parse_sub_message ( parent_type )
@@ -308,7 +304,7 @@ module MessageFormat
         raise_expected('}')
       end
       @index += 1 # move passed }
-      return message
+      message
     end
 
     def parse_message ( parent_type )
@@ -330,7 +326,7 @@ module MessageFormat
           elements.push(text)
         end
       end
-      return elements
+      elements
     end
 
     def raise_expected ( expected=nil, found=nil, message=nil )
@@ -349,14 +345,13 @@ module MessageFormat
     end
 
     def error_message ( expected=nil, found )
-      if !expected
-        return "Unexpected \"#{ found }\" found"
-      end
-      return "Expected \"#{ expected }\" but found \"#{ found }\""
+      expected ?
+        "Expected \"#{ expected }\" but found \"#{ found }\"" :
+        "Unexpected \"#{ found }\" found" 
     end
 
     def self.parse ( pattern )
-      return Parser.new().parse(pattern)
+      Parser.new().parse(pattern)
     end
 
     #

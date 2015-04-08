@@ -26,16 +26,16 @@ module MessageFormat
 
     def parse ( pattern )
       if !pattern.is_a?(String)
-        throwExpected('String pattern', pattern.class.to_s)
+        raise_expected('String pattern', pattern.class.to_s)
       end
 
       @pattern = pattern
       @length = pattern.length
       @index = 0
-      return parseMessage("message")
+      return parse_message("message")
     end
 
-    def isDigit ( char )
+    def is_digit ( char )
       return (
         char == '0' or
         char == '1' or
@@ -50,7 +50,7 @@ module MessageFormat
       )
     end
 
-    def isWhitespace ( char )
+    def is_whitespace ( char )
       return (
         char == "\s" or
         char == "\t" or
@@ -64,23 +64,23 @@ module MessageFormat
       )
     end
 
-    def skipWhitespace ()
-      while @index < @length and isWhitespace(@pattern[@index])
+    def skip_whitespace ()
+      while @index < @length and is_whitespace(@pattern[@index])
         @index += 1
       end
     end
 
-    def parseText ( parentType )
-      isHashSpecial = (parentType == 'plural' or parentType == 'selectordinal')
-      isArgStyle = (parentType == 'style')
+    def parse_text ( parent_type )
+      is_hash_special = (parent_type == 'plural' or parent_type == 'selectordinal')
+      is_arg_style = (parent_type == 'style')
       text = ''
       while @index < @length
         char = @pattern[@index]
         if (
           char == '{' or
           char == '}' or
-          (isHashSpecial and char == '#') or
-          (isArgStyle and isWhitespace(char))
+          (is_hash_special and char == '#') or
+          (is_arg_style and is_whitespace(char))
         )
           break
         elsif char == '\''
@@ -93,8 +93,8 @@ module MessageFormat
             # only when necessary
             char == '{' or
             char == '}' or
-            (isHashSpecial and char == '#') or
-            (isArgStyle and isWhitespace(char))
+            (is_hash_special and char == '#') or
+            (is_arg_style and is_whitespace(char))
           )
             text += char
             while @index + 1 < @length
@@ -123,25 +123,25 @@ module MessageFormat
       return text
     end
 
-    def parseArgument ()
+    def parse_argument ()
       if @pattern[@index] == '#'
         @index += 1 # move passed #
         return [ '#' ]
       end
 
       @index += 1 # move passed {
-      id = parseArgId()
+      id = parse_arg_id()
       char = @pattern[@index]
       if char == '}' # end argument
         @index += 1 # move passed }
         return [ id ]
       end
       if char != ','
-        throwExpected(',')
+        raise_expected(',')
       end
       @index += 1 # move passed ,
 
-      type = parseArgType()
+      type = parse_arg_type()
       char = @pattern[@index]
       if char == '}' # end argument
         if (
@@ -149,29 +149,29 @@ module MessageFormat
           type == 'selectordinal' or
           type == 'select'
         )
-          throwExpected(type + ' message options')
+          raise_expected(type + ' message options')
         end
         @index += 1 # move passed }
         return [ id, type ]
       end
       if char != ','
-        throwExpected(',')
+        raise_expected(',')
       end
       @index += 1 # move passed ,
 
       format = nil
       offset = nil
       if type == 'plural' or type == 'selectordinal'
-        offset = parsePluralOffset()
-        format = parseSubMessages(type)
+        offset = parse_plural_offset()
+        format = parse_sub_messages(type)
       elsif type == 'select'
-        format = parseSubMessages(type)
+        format = parse_sub_messages(type)
       else
-        format = parseSimpleFormat()
+        format = parse_simple_format()
       end
       char = @pattern[@index]
       if char != '}' # not ended argument
-        throwExpected('}')
+        raise_expected('}')
       end
       @index += 1 # move passed
 
@@ -180,152 +180,152 @@ module MessageFormat
         [ id, type, format ]
     end
 
-    def parseArgId ()
-      skipWhitespace()
+    def parse_arg_id ()
+      skip_whitespace()
       id = ''
       while @index < @length
         char = @pattern[@index]
         if char == '{' or char == '#'
-          throwExpected('argument id')
+          raise_expected('argument id')
         end
-        if char == '}' or char == ',' or isWhitespace(char)
+        if char == '}' or char == ',' or is_whitespace(char)
           break
         end
         id += char
         @index += 1
       end
       if id.empty?
-        throwExpected('argument id')
+        raise_expected('argument id')
       end
-      skipWhitespace()
+      skip_whitespace()
       return id
     end
 
-    def parseArgType ()
-      skipWhitespace()
-      argType = nil
+    def parse_arg_type ()
+      skip_whitespace()
+      arg_type = nil
       types = [
         'number', 'date', 'time', 'ordinal', 'duration', 'spellout', 'plural', 'selectordinal', 'select'
       ]
       types.each do |type|
         if @pattern.slice(@index, type.length) == type
-          argType = type
+          arg_type = type
           @index += type.length
           break
         end
       end
-      if !argType
-        throwExpected(types.join(', '))
+      if !arg_type
+        raise_expected(types.join(', '))
       end
-      skipWhitespace()
-      return argType
+      skip_whitespace()
+      return arg_type
     end
 
-    def parseSimpleFormat ()
-      skipWhitespace()
-      style = parseText('style')
+    def parse_simple_format ()
+      skip_whitespace()
+      style = parse_text('style')
       if style.empty?
-        throwExpected('argument style name')
+        raise_expected('argument style name')
       end
-      skipWhitespace()
+      skip_whitespace()
       return style
     end
 
-    def parsePluralOffset ()
-      skipWhitespace()
+    def parse_plural_offset ()
+      skip_whitespace()
       offset = 0
       if @pattern.slice(@index, 7) == 'offset:'
         @index += 7 # move passed offset:
-        skipWhitespace()
+        skip_whitespace()
         start = @index
         while (
           @index < @length and
-          isDigit(@pattern[@index])
+          is_digit(@pattern[@index])
         )
           @index += 1
         end
         if start == @index
-          throwExpected('offset number')
+          raise_expected('offset number')
         end
         offset = @pattern[start..@index].to_i
-        skipWhitespace()
+        skip_whitespace()
       end
       return offset
     end
 
-    def parseSubMessages ( parentType )
-      skipWhitespace()
+    def parse_sub_messages ( parent_type )
+      skip_whitespace()
       options = {}
-      hasSubs = false
+      has_subs = false
       while (
         @index < @length and
         @pattern[@index] != '}'
       )
-        selector = parseSelector()
-        skipWhitespace()
-        options[selector] = parseSubMessage(parentType)
-        hasSubs = true
-        skipWhitespace()
+        selector = parse_selector()
+        skip_whitespace()
+        options[selector] = parse_sub_message(parent_type)
+        has_subs = true
+        skip_whitespace()
       end
-      if !hasSubs
-        throwExpected(parentType + ' message options')
+      if !has_subs
+        raise_expected(parent_type + ' message options')
       end
       if !options.has_key?('other') # does not have an other selector
-        throwExpected(nil, nil, '"other" option must be specified in ' + parentType)
+        raise_expected(nil, nil, '"other" option must be specified in ' + parent_type)
       end
       return options
     end
 
-    def parseSelector ()
+    def parse_selector ()
       selector = ''
       while @index < @length
         char = @pattern[@index]
         if char == '}' or char == ','
-          throwExpected('{')
+          raise_expected('{')
         end
-        if char == '{' or isWhitespace(char)
+        if char == '{' or is_whitespace(char)
           break
         end
         selector += char
         @index += 1
       end
       if selector.empty?
-        throwExpected('selector')
+        raise_expected('selector')
       end
-      skipWhitespace()
+      skip_whitespace()
       return selector
     end
 
-    def parseSubMessage ( parentType )
+    def parse_sub_message ( parent_type )
       char = @pattern[@index]
       if char != '{'
-        throwExpected('{')
+        raise_expected('{')
       end
       @index += 1 # move passed {
-      message = parseMessage(parentType)
+      message = parse_message(parent_type)
       char = @pattern[@index]
       if char != '}'
-        throwExpected('}')
+        raise_expected('}')
       end
       @index += 1 # move passed }
       return message
     end
 
-    def parseMessage ( parentType )
+    def parse_message ( parent_type )
       elements = []
-      text = parseText(parentType)
+      text = parse_text(parent_type)
       if !text.empty?
         elements.push(text)
       end
       while @index < @length
         if @pattern[@index] == '}'
-          if parentType == 'message'
-            throwExpected()
+          if parent_type == 'message'
+            raise_expected()
           end
           break
         end
-        elements.push(parseArgument())
-        text = parseText(parentType)
+        elements.push(parse_argument())
+        text = parse_text(parent_type)
         if !text.empty?
           elements.push(text)
         end
@@ -333,7 +333,7 @@ module MessageFormat
       return elements
     end
 
-    def throwExpected ( expected=nil, found=nil, message=nil )
+    def raise_expected ( expected=nil, found=nil, message=nil )
       lines = @pattern[0..@index].split(/\r?\n/)
       line = lines.length
       column = lines.last.length
@@ -341,14 +341,14 @@ module MessageFormat
         found = @index < @length ? @pattern[@index] : 'end of input'
       end
       if !message
-        message = errorMessage(expected, found)
+        message = error_message(expected, found)
       end
       message += ' in "' + @pattern.gsub(/\r?\n/, "\n") + '"'
 
       raise SyntaxError.new(message, expected, found, @index, line, column)
     end
 
-    def errorMessage ( expected=nil, found )
+    def error_message ( expected=nil, found )
       if !expected
         return "Unexpected \"#{ found }\" found"
       end

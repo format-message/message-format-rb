@@ -19,19 +19,19 @@ module MessageFormat
 
     def initialize ( options=nil )
       if options and options.has_key?(:locale)
-        @originalLocale = options[:locale]
+        @locale = options[:locale]
       else
-        @originalLocale = TwitterCldr.locale
+        @locale = TwitterCldr.locale
       end
     end
 
     def interpret ( elements )
-      return interpretSubs(elements)
+      return interpret_subs(elements)
     end
 
-    def interpretSubs ( elements, parent=nil )
+    def interpret_subs ( elements, parent=nil )
       elements = elements.map do |element|
-        interpretElement(element, parent)
+        interpret_element(element, parent)
       end
 
       # optimize common case
@@ -40,17 +40,13 @@ module MessageFormat
       end
 
       return lambda do |args|
-        message = ''
-        elements.map do |element|
-          message += element.call(args)
-        end
-        return message
+        elements.map { |element| element.call(args) }.join ''
       end
     end
 
-    def interpretElement ( element, parent=nil )
+    def interpret_element ( element, parent=nil )
       if element.is_a?(String)
-        return lambda { |args=nil| return element }
+        return lambda { |args=nil| element }
       end
 
       id, type, style = element
@@ -67,24 +63,24 @@ module MessageFormat
 
       case type
         when 'number'
-          return interpretNumber(id, offset, style)
+          return interpret_number(id, offset, style)
         when 'date', 'time'
-          return interpretDateTime(id, type, style)
+          return interpret_date_time(id, type, style)
         when 'plural', 'selectordinal'
           offset = element[2]
           options = element[3]
-          return interpretPlural(id, type, offset, options)
+          return interpret_plural(id, type, offset, options)
         when 'select'
-          return interpretSelect(id, style)
+          return interpret_select(id, style)
         when 'spellout', 'ordinal', 'duration'
-          return interpretNumber(id, offset, type)
+          return interpret_number(id, offset, type)
         else
-          return interpretSimple(id)
+          return interpret_simple(id)
       end
     end
 
-    def interpretNumber ( id, offset, style )
-      locale = @originalLocale
+    def interpret_number ( id, offset, style )
+      locale = @locale
       return lambda do |args|
         number = TwitterCldr::Localized::LocalizedNumber.new(args[id] - offset, locale)
         if style == 'integer'
@@ -103,8 +99,8 @@ module MessageFormat
       end
     end
 
-    def interpretDateTime ( id, type, style='medium' )
-      locale = @originalLocale
+    def interpret_date_time ( id, type, style='medium' )
+      locale = @locale
       return lambda do |args|
         datetime = TwitterCldr::Localized::LocalizedDateTime.new(args[id], locale)
         datetime = type == 'date' ? datetime.to_date : datetime.to_time
@@ -122,19 +118,19 @@ module MessageFormat
       end
     end
 
-    def interpretPlural ( id, type, offset, children )
+    def interpret_plural ( id, type, offset, children )
       parent = [ id, type, offset ]
       options = {}
       children.each do |key, value|
-        options[key.to_sym] = interpretSubs(value, parent)
+        options[key.to_sym] = interpret_subs(value, parent)
       end
 
-      locale = @originalLocale
-      pluralType = type == 'selectordinal' ? :ordinal : :cardinal
+      locale = @locale
+      plural_type = type == 'selectordinal' ? :ordinal : :cardinal
       return lambda do |args|
         arg = args[id]
         exactSelector = ('=' + arg.to_s).to_sym
-        keywordSelector = TwitterCldr::Formatters::Plurals::Rules.rule_for(arg - offset, locale, pluralType)
+        keywordSelector = TwitterCldr::Formatters::Plurals::Rules.rule_for(arg - offset, locale, plural_type)
         func =
           options[exactSelector] ||
           options[keywordSelector] ||
@@ -143,10 +139,10 @@ module MessageFormat
       end
     end
 
-    def interpretSelect ( id, children )
+    def interpret_select ( id, children )
       options = {}
       children.each do |key, value|
-        options[key.to_sym] = interpretSubs(value, nil)
+        options[key.to_sym] = interpret_subs(value, nil)
       end
       return lambda do |args|
         selector = args[id].to_sym
@@ -157,7 +153,7 @@ module MessageFormat
       end
     end
 
-    def interpretSimple ( id )
+    def interpret_simple ( id )
       return lambda do |args|
         return args[id].to_s
       end

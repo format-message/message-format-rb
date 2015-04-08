@@ -1,0 +1,40 @@
+# ignore system files
+
+# OS X
+.DS_Store
+.Spotlight-V100
+.Trashes
+._*
+
+# Win
+Thumbs.db
+Desktop.ini
+
+# vim
+*~
+.swp
+.*.sw[a-z]
+Session.vim
+
+*.gem
+*.rbc
+.bundle
+.config
+.yardoc
+Gemfile.lock
+InstalledFiles
+_yardoc
+coverage
+doc/
+lib/bundler/man
+pkg
+rdoc
+spec/reports
+test/tmp
+test/version_tmp
+tmp
+*.bundle
+*.so
+*.o
+*.a
+mkmf.log

@@ -29,7 +29,7 @@ The [ICU Message Format][icu-message] is a great format for user-visible strings
 
 ## Contributing
 
-1. Fork it ( https://github.com/thetalecrafter/message-format-rb/fork )
+1. Fork it ( https://github.com/format-message/message-format-rb/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -43,5 +43,5 @@ This software is free to use under the MIT license. See the [LICENSE.txt file][L
 [icu-cpp]: http://icu-project.org/apiref/icu4c/classicu_1_1MessageFormat.html
 [icu-php]: http://php.net/manual/en/class.messageformatter.php
 [icu-java]: http://icu-project.org/apiref/icu4j/
-[icu-javascript]: https://github.com/thetalecrafter/message-format
-[LICENSE]: https://github.com/thetalecrafter/message-format-rb/blob/master/LICENSE.txt
+[icu-javascript]: https://github.com/format-message/message-format
+[LICENSE]: https://github.com/format-message/message-format-rb/blob/master/LICENSE.txt

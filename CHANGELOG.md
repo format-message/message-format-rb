@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.3
+
+* **Internal**
+  * Move repo ownership to format-message org
+
 ## 0.0.2
 
 * **New Feature**

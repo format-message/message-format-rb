@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["andy@instructure.com"]
   spec.summary       = %q{Parse and format i18n messages using ICU MessageFormat patterns}
   spec.description   = %q{Parse and format i18n messages using ICU MessageFormat patterns, including simple placeholders, number and date placeholders, and selecting among submessages for gender and plural arguments.}
-  spec.homepage      = "https://github.com/thetalecrafter/message-format-rb"
+  spec.homepage      = "https://github.com/format-message/message-format-rb"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")

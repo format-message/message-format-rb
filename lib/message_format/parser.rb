@@ -360,7 +360,6 @@ module MessageFormat
     #
     class SyntaxError < StandardError
 
-      attr_reader :message
       attr_reader :expected
       attr_reader :found
       attr_reader :offset
@@ -368,7 +367,7 @@ module MessageFormat
       attr_reader :column
 
       def initialize (message, expected, found, offset, line, column)
-        @message = message
+        super(message)
         @expected = expected
         @found = found
         @offset = offset

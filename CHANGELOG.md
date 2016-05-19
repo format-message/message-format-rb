@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.4
+
+* **Bug Fix**
+  * set SyntaxError message so it is displayed properly
+
 ## 0.0.3
 
 * **Internal**

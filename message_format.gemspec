@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "message_format"
   spec.version       = MessageFormat::VERSION
   spec.authors       = ["Andy VanWagoner"]
-  spec.email         = ["andy@instructure.com"]
+  spec.email         = ["andy@thetalecrafter.com"]
   spec.summary       = %q{Parse and format i18n messages using ICU MessageFormat patterns}
   spec.description   = %q{Parse and format i18n messages using ICU MessageFormat patterns, including simple placeholders, number and date placeholders, and selecting among submessages for gender and plural arguments.}
   spec.homepage      = "https://github.com/format-message/message-format-rb"

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5
+
+* Update twitter_cldr dependency
+
 ## 0.0.4
 
 * **Bug Fix**

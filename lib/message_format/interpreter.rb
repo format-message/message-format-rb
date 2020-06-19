@@ -84,7 +84,7 @@ module MessageFormat
       lambda do |args|
         number = TwitterCldr::Localized::LocalizedNumber.new(args[id] - offset, locale)
         if style == 'integer'
-          number.to_decimal(:precision => 0).to_s
+          number.to_decimal.to_s(:precision => 0)
         elsif style == 'percent'
           number.to_percent.to_s
         elsif style == 'currency'

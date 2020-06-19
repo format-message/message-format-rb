@@ -47,6 +47,13 @@ describe MessageFormat do
       expect(message).to match(/^0 \: \d\d?\/\d\d?\/\d{2,4} \d\d?\:\d\d [AP]M$/)
     end
 
+    it 'formats integer number' do
+      pattern = '{ n, number, integer }'
+      message = MessageFormat.new(pattern, 'en-US').format({ n: 1234 })
+
+      expect(message).to match('1,234')
+    end
+
     it 'handles plurals' do
       pattern =
         'On {takenDate, date, short} {name} {numPeople, plural, offset:1

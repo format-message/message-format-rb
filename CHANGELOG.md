@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.7
+
+* Fix integer number formatter
+
 ## 0.0.6
 
 * Update twitter_cldr dependency

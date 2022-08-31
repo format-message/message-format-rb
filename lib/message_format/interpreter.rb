@@ -23,10 +23,35 @@ module MessageFormat
       else
         @locale = TwitterCldr.locale
       end
+      @raise_on_missing_params = options[:raise_on_missing_params]
+    end
+
+    #
+    # MissingParametersError
+    #  Holds information about parameters that were accessed during interpretation but were not
+    #  provided. Only raised if the `raise_on_missing_params` option is set to `true`.
+    #
+    #  Example:
+    #  message = MessageFormat.new('Hello { place } and { player }!', 'en-US', raise_on_missing_params: true)
+    #  formatted = message.format({ :place => 'World' }) # raises with "player" identified as a missing parameter
+    #
+    #  Note that only parameters that were actually accessed during interpretation will be reported.
+    #
+    class MissingParametersError < StandardError
+      attr_reader :missing_params
+
+      def initialize ( message, missing_params )
+        super(message)
+        @missing_params = missing_params
+      end
     end
 
     def interpret ( elements )
+      @missing_ids = []
       interpret_subs(elements)
+      if @raise_on_missing_params && !@missing_ids.empty?
+        raise MissingParametersError.new('Missing parameters detected during interpretation', @missing_ids.compact)
+      end
     end
 
     def interpret_subs ( elements, parent=nil )
@@ -82,6 +107,7 @@ module MessageFormat
     def interpret_number ( id, offset, style )
       locale = @locale
       lambda do |args|
+        @missing_ids.push(id) unless args.key?(id)
         number = TwitterCldr::Localized::LocalizedNumber.new(args[id] - offset, locale)
         if style == 'integer'
           number.to_decimal.to_s(:precision => 0)
@@ -102,6 +128,7 @@ module MessageFormat
     def interpret_date_time ( id, type, style='medium' )
       locale = @locale
       lambda do |args|
+        @missing_ids.push(id) unless args.key?(id)
         datetime = TwitterCldr::Localized::LocalizedDateTime.new(args[id], locale)
         datetime = type == 'date' ? datetime.to_date : datetime.to_time
         if style == 'medium'
@@ -128,6 +155,7 @@ module MessageFormat
       locale = @locale
       plural_type = type == 'selectordinal' ? :ordinal : :cardinal
       lambda do |args|
+        @missing_ids.push(id) unless args.key?(id)
         arg = args[id]
         exactSelector = ('=' + arg.to_s).to_sym
         keywordSelector = TwitterCldr::Formatters::Plurals::Rules.rule_for(arg - offset, locale, plural_type)
@@ -145,6 +173,7 @@ module MessageFormat
         options[key.to_sym] = interpret_subs(value, nil)
       end
       lambda do |args|
+        @missing_ids.push(id) unless args.key?(id)
         selector = args[id].to_sym
         func =
           options[selector] ||
@@ -154,7 +183,10 @@ module MessageFormat
     end
 
     def interpret_simple ( id )
-      lambda { |args| args[id].to_s }
+      lambda do |args|
+        @missing_ids.push(id) unless args.key?(id)
+        args[id].to_s
+      end
     end
 
     def self.interpret ( elements, options=nil )

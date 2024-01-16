@@ -48,10 +48,11 @@ module MessageFormat
 
     def interpret ( elements )
       @missing_ids = []
-      interpret_subs(elements)
+      interpreted = interpret_subs(elements)
       if @raise_on_missing_params && !@missing_ids.empty?
         raise MissingParametersError.new('Missing parameters detected during interpretation', @missing_ids.compact)
       end
+      interpreted
     end
 
     def interpret_subs ( elements, parent=nil )

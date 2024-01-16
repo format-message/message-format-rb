@@ -26,7 +26,7 @@ module MessageFormat
   class << self
 
     def new ( pattern, locale=nil, raise_on_missing_params: false )
-      MessageFormat.new(pattern, locale, raise_on_missing_params)
+      MessageFormat.new(pattern, locale, raise_on_missing_params: raise_on_missing_params)
     end
 
     def format_message ( pattern, args=nil, locale=nil, raise_on_missing_params: false )

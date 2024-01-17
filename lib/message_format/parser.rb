@@ -179,7 +179,7 @@ module MessageFormat
 
     def parse_arg_id ()
       skip_whitespace()
-      id = ''
+      id = +''
       while @index < @length
         char = @pattern[@index]
         if char == '{' or char == '#'
@@ -188,7 +188,7 @@ module MessageFormat
         if char == '}' or char == ',' or is_whitespace(char)
           break
         end
-        id += char
+        id << char
         @index += 1
       end
       if id.empty?

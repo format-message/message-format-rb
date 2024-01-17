@@ -274,7 +274,7 @@ module MessageFormat
     end
 
     def parse_selector ()
-      selector = ''
+      selector = +''
       while @index < @length
         char = @pattern[@index]
         if char == '}' or char == ','
@@ -283,7 +283,7 @@ module MessageFormat
         if char == '{' or is_whitespace(char)
           break
         end
-        selector += char
+        selector << char
         @index += 1
       end
       if selector.empty?

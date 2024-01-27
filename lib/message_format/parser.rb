@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Parser
 #
@@ -69,7 +70,7 @@ module MessageFormat
     def parse_text ( parent_type )
       is_hash_special = (parent_type == 'plural' or parent_type == 'selectordinal')
       is_arg_style = (parent_type == 'style')
-      text = ''
+      text = +''
       while @index < @length
         char = @pattern[@index]
         if (
@@ -83,7 +84,7 @@ module MessageFormat
           @index += 1
           char = @pattern[@index]
           if char == '\'' # double is always 1 '
-            text += char
+            text << char
             @index += 1
           elsif (
             # only when necessary
@@ -92,26 +93,26 @@ module MessageFormat
             (is_hash_special and char == '#') or
             (is_arg_style and is_whitespace(char))
           )
-            text += char
+            text << char
             while @index + 1 < @length
               @index += 1
               char = @pattern[@index]
               if @pattern.slice(@index, 2) == '\'\'' # double is always 1 '
-                text += char
+                text << char
                 @index += 1
               elsif char == '\'' # end of quoted
                 @index += 1
                 break
               else
-                text += char
+                text << char
               end
             end
           else # lone ' is just a '
-            text += '\''
+            text << '\''
             # already incremented
           end
         else
-          text += char
+          text << char
           @index += 1
         end
       end
@@ -178,7 +179,7 @@ module MessageFormat
 
     def parse_arg_id ()
       skip_whitespace()
-      id = ''
+      id = +''
       while @index < @length
         char = @pattern[@index]
         if char == '{' or char == '#'
@@ -187,7 +188,7 @@ module MessageFormat
         if char == '}' or char == ',' or is_whitespace(char)
           break
         end
-        id += char
+        id << char
         @index += 1
       end
       if id.empty?
@@ -273,7 +274,7 @@ module MessageFormat
     end
 
     def parse_selector ()
-      selector = ''
+      selector = +''
       while @index < @length
         char = @pattern[@index]
         if char == '}' or char == ','
@@ -282,7 +283,7 @@ module MessageFormat
         if char == '{' or is_whitespace(char)
           break
         end
-        selector += char
+        selector << char
         @index += 1
       end
       if selector.empty?

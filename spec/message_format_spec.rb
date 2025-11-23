@@ -33,6 +33,13 @@ describe MessageFormat do
       expect(message).to eql('This isn\'t a {\'simple\'} \'string\'')
     end
 
+    it 'handles escaped single apostrophe escapes' do
+      pattern = 'Hello \'{literal}!'
+      message = MessageFormat.new(pattern, 'en-US').format()
+
+      expect(message).to eql('Hello {literal}!')
+    end
+
     it 'accepts arguments' do
       pattern = 'x{ arg }z'
       message = MessageFormat.new(pattern, 'en-US').format({ :arg => 'y' })

@@ -94,6 +94,7 @@ module MessageFormat
             (is_arg_style and is_whitespace(char))
           )
             text << char
+            found_closing_quote = false
             while @index + 1 < @length
               @index += 1
               char = @pattern[@index]
@@ -102,10 +103,16 @@ module MessageFormat
                 @index += 1
               elsif char == '\'' # end of quoted
                 @index += 1
+                found_closing_quote = true
                 break
               else
                 text << char
               end
+            end
+            # If no closing quote was found, increment past the last character
+            # to avoid reprocessing it in the outer loop
+            if !found_closing_quote
+              @index += 1
             end
           else # lone ' is just a '
             text << '\''

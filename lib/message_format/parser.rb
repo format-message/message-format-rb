@@ -189,7 +189,7 @@ module MessageFormat
       id = +''
       while @index < @length
         char = @pattern[@index]
-        if char == '{' or char == '#'
+        if char == '{' or char == '#' or char == '.' or char == '(' or char == ')'
           raise_expected('argument id')
         end
         if char == '}' or char == ',' or is_whitespace(char)
